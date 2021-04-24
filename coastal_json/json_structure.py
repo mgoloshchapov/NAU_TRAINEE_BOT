@@ -1,8 +1,8 @@
 import json5
 
-if __name__ == '__main__':
-    file = open('json_template.json5', 'w')
-    dict_data = {'id': 0,
+
+def dict_data():
+    data = {'id': 0,
                  'credentials':
                      {'fist_name': 'Ivan',
                       'second_name': 'Ivanvov',
@@ -49,5 +49,8 @@ if __name__ == '__main__':
                  'entrance_tasks': '',
                  'agreement': False
                  }
+    return data
 
+if __name__ == '__main__':
+    file = open('json_template.json5', 'w')
     json5.dump(dict_data, file, indent=2)
