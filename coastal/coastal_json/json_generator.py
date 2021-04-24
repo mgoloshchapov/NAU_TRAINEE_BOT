@@ -17,3 +17,17 @@ def test_for_user(user_id):
     except FileNotFoundError:
         return False
     return True
+
+
+def get_user_data(user_id):
+    if test_for_user(user_id):
+        file = open('users/user_{}.json5'.format(user_id), 'r')
+        data = json5.load(file)
+        return data
+    else:
+        return init_user(user_id)
+
+
+def update_user_data(user_id, data):
+    file = open('users/user_{}.json5'.format(user_id), 'w')
+    json5.dump(data, file, indent=2)

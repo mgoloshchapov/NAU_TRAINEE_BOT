@@ -4,7 +4,7 @@ import json5
 def dict_data():
     data = {'id': 0,
                  'credentials':
-                     {'fist_name': 'Ivan',
+                     {'first_name': 'Ivan',
                       'second_name': 'Ivanvov',
                       'patronymic': None,
                       'birthdate': '01-01-1970',
