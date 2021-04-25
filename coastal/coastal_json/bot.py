@@ -1,6 +1,6 @@
 from config import token
 import telebot
-import json_generator
+from coastal import json_generator
 
 bot = telebot.TeleBot(token)
 
