@@ -80,7 +80,6 @@ def get_dict():
                 el = el[:f] + el[(s + 1):]
             information.append(el.capitalize())
         link_to_utility[link] = (title, information)
-        # print(link, information)
 
     for town_id, town in town_names.items():
         ret_dict[town] = {}
@@ -88,7 +87,29 @@ def get_dict():
             title, information = link_to_utility[link]
             ret_dict[town][title] = information
 
-    return ret_dict
+    # Индексация словаря(для использования в callback_data, так как не передает длинные строки)
+    last_idx = 0
+    new_dict = dict()
+    for city in ret_dict.keys():
+        if len(ret_dict[city]) > 0:
+            new_dict['{},{}:'.format(last_idx, last_idx+len(ret_dict[city])) + city] = ret_dict[city]
+            last_idx += len(ret_dict[city])
+        else:
+            new_dict['{},{}:'.format("#", '#') + city] = ret_dict[city]
+    ret_dict = new_dict.copy()
+    idx = 1
+    final_dict = dict()
+    for city in ret_dict.keys():
+        new_dict = dict()
+        for vac in ret_dict[city].keys():
+            new_dict['{}:'.format(idx) + vac] = ret_dict[city][vac]
+            idx += 1
+        final_dict[city] = new_dict
+
+    return final_dict
 
 
-print(get_dict())
+if __name__ == '__main__':
+    res = get_dict()
+
+    print(list(res.values()))

@@ -214,4 +214,5 @@ if __name__ == "__main__":
     for key in bad_keys:
         del faqs[key]
 
-    bot.polling(none_stop=True)
+    while True:
+        bot.polling(none_stop=True)

@@ -3,7 +3,7 @@ import gspread
 
 class Manager:
     none = "---"
-    columns = ['Putin', 'Фамилия', 'Имя', 'Отчество', 'Дата рождения', 'Город проживания', 'E-mail', 'Телефон',
+    columns = ['ID', 'Фамилия', 'Имя', 'Отчество', 'Дата рождения', 'Город проживания', 'E-mail', 'Телефон',
                'Город стажировки',
                'Сколько часов в неделю сможешь уделять стажировке?', 'Когда сможешь приступить к стажировке?',
                'Сможешь продолжать работу после окончания стажировки?', 'Образование',
@@ -70,3 +70,7 @@ class Manager:
         row = self.get_row(id)
         index = self.vacancies_names.index(vacancy)
         self.vacancies_lists[index].append_row(row[:len(self.columns)])
+
+    def apply_row(self, row, vacancy):
+        index = self.vacancies_names.index(vacancy)
+        self.vacancies_lists[index].append_row(row)
