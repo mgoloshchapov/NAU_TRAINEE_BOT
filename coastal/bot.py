@@ -13,27 +13,33 @@ def polling(message, bot_message=None):
     user_data = json_generator.get_user_data(message.from_user.id)
     kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, row_width=2)
     kb.add('Личные данные', 'Условия стажировки', 'Образование', 'Опыт работы', 'Опыт кандидата',
-           'Как ты узнал о Naumen?', 'Загрузка резюме и задания', 'Отправка Резюме')
+           'Как ты узнал о Naumen?', 'Загрузка резюме', 'Отправка задания')
     bot_message = bot.send_message(message.from_user.id, 'Какую часть анкеты вы хотите заполниь?', reply_markup=kb)
     bot.register_next_step_handler(message, polling_distribution, user_data, bot_message=bot_message)
+    bot.delete_message(message.from_user.id, message.id)
 
 
 def end_polling(message, user_data, yn=False, bot_message=None):
-    bot.delete_message(bot_message.chat.id, bot_message.id)
+    if bot_message is not None:
+        bot.delete_message(bot_message.chat.id, bot_message.id)
     if yn:
         if message.text == 'Да':
             polling(message, bot_message=message)
-            return
-        else:
-            return
-    json_generator.update_user_data(message.from_user.id, user_data)
-    kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    kb.row('Да', 'Нет')
-    bot_message = bot.send_message(message.from_user.id, 'Хотетие продолжить заполнять анкету?', reply_markup=kb)
-    bot.register_next_step_handler(message, end_polling, user_data, yn=True, bot_message=bot_message)
+
+    else:
+        json_generator.update_user_data(message.from_user.id, user_data)
+        kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        kb.row('Да', 'Нет')
+        bot_message = bot.send_message(message.from_user.id, 'Хотетие продолжить заполнять анкету?', reply_markup=kb)
+        bot.register_next_step_handler(message, end_polling, user_data, yn=True, bot_message=bot_message)
+
+    bot.delete_message(message.from_user.id, message.id)
 
 
 def polling_distribution(message, user_data, bot_message=None):
+    if bot_message is not None:
+        bot.delete_message(bot_message.chat.id, bot_message.id)
+
     t = message.text
     if t == 'Личные данные':
         enter_credentials(message, user_data)
@@ -47,16 +53,16 @@ def polling_distribution(message, user_data, bot_message=None):
         enter_experience(message, user_data)
     elif t == 'Как ты узнал о Naumen?':
         enter_naumen(message, user_data)
-    elif t == 'Загрузка резюме и задания':
-        # enter_credentials(message, user_data)
+    elif t == 'Загрузка резюме':
+        enter_resume(message, user_data)
+    elif t == 'Отправка задания':
+        enter_tasks(message, user_data)
         pass
-    elif t == 'Отправка Резюме':
-        # enter_credentials(message, user_data)
-        pass
+
     bot.delete_message(bot_message.chat.id, bot_message.id)
 
 
-def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
+def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, sec_bot_message=None):
     if yn:
         if message.text == 'Да':
             step += 1
@@ -69,7 +75,8 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
     if step == 0:
 
         bot_message = bot.send_message(message.from_user.id, "Введите ФИО:")
-        bot.register_next_step_handler(message, enter_credentials, user_data, 1, bot_message=bot_message)
+        bot.register_next_step_handler(message, enter_credentials, user_data, 1, bot_message=bot_message,
+                                       sec_bot_message=sec_bot_message)
 
     elif step == 1:
 
@@ -78,7 +85,8 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
     elif step == 2:
 
         bot_message = bot.send_message(message.from_user.id, "Введите вашу дату рождения в формате дд мм гггг:")
-        bot.register_next_step_handler(message, enter_credentials, user_data, 3, bot_message=bot_message)
+        bot.register_next_step_handler(message, enter_credentials, user_data, 3, bot_message=bot_message,
+                                       sec_bot_message=sec_bot_message)
 
     elif step == 3:
 
@@ -87,7 +95,8 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
     elif step == 4:
 
         bot_message = bot.send_message(message.from_user.id, "Введите город жительства:")
-        bot.register_next_step_handler(message, enter_credentials, user_data, 5, bot_message=bot_message)
+        bot.register_next_step_handler(message, enter_credentials, user_data, 5, bot_message=bot_message,
+                                       sec_bot_message=sec_bot_message)
 
     elif step == 5:
 
@@ -96,7 +105,8 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
     elif step == 6:
 
         bot_message = bot.send_message(message.from_user.id, "Введите ваш адресс электронной почты:")
-        bot.register_next_step_handler(message, enter_credentials, user_data, 7, bot_message=bot_message)
+        bot.register_next_step_handler(message, enter_credentials, user_data, 7, bot_message=bot_message,
+                                       sec_bot_message=sec_bot_message)
 
     elif step == 7:
 
@@ -105,7 +115,8 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
     elif step == 8:
 
         bot_message = bot.send_message(message.from_user.id, "Введите ваш номер телефона:")
-        bot.register_next_step_handler(message, enter_credentials, user_data, 9, bot_message=bot_message)
+        bot.register_next_step_handler(message, enter_credentials, user_data, 9, bot_message=bot_message,
+                                       sec_bot_message=sec_bot_message)
 
     elif step == 9:
 
@@ -115,6 +126,9 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
 
         end_polling(message, user_data, bot_message=message)
 
+    if sec_bot_message is not None:
+        bot.delete_message(sec_bot_message.from_user.id, sec_bot_message.id)
+
     if step % 2 == 1:
         if b:
             kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
@@ -122,16 +136,17 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None):
             bot_message = bot.send_message(message.from_user.id,
                                            'Верны ли данные:\n{}'.format(text),
                                            reply_markup=kb)
+            bot.delete_message(message.from_user.id, message.id)
             bot.register_next_step_handler(message, enter_credentials, user_data, step, yn=True,
                                            bot_message=bot_message)
+
         else:
-            bot.send_message(message.from_user.id, text)
-            enter_credentials(message, user_data, step - 1, bot_message=None)
+            bot_message = bot.send_message(message.from_user.id, text)
+            bot.delete_message(message.from_user.id, message.id)
+            enter_credentials(message, user_data, step - 1, sec_bot_message=bot_message)
 
-    bot.delete_message(message.from_user.id, message.id)
 
-
-def enter_probation(message, user_data, step=0, yn=False, bot_message=None):
+def enter_probation(message, user_data, step=0, yn=False, bot_message=None, sec_bot_message=None):
     if yn:
         if message.text == 'Да':
             step += 1
@@ -202,7 +217,10 @@ def enter_probation(message, user_data, step=0, yn=False, bot_message=None):
             bot.register_next_step_handler(message, enter_probation, user_data, step, yn=True, bot_message=bot_message)
         else:
             bot_message = bot.send_message(message.from_user.id, text)
-            enter_probation(message, user_data, step - 1, bot_message=None)
+            enter_probation(message, user_data, step - 1, sec_bot_message=bot_message)
+
+    if sec_bot_message is not None:
+        bot.delete_message(sec_bot_message.chat.id, sec_bot_message.id)
 
     bot.delete_message(message.from_user.id, message.id)
 
@@ -565,6 +583,66 @@ def enter_naumen(message, user_data, step=0, yn=False, bot_message=None):
         else:
             bot.send_message(message.from_user.id, text)
             enter_naumen(message, user_data, step - 1, bot_message=None)
+
+    bot.delete_message(message.from_user.id, message.id)
+
+
+def enter_resume(message, user_data, step=0, yn=False, bot_message=None):
+    if yn:
+        if message.text == 'Да':
+            step += 1
+        else:
+            step -= 1
+
+    if bot_message is not None:
+        bot.delete_message(bot_message.chat.id, bot_message.id)
+
+    if step == 0:
+        bot_message = bot.send_message(message.from_user.id, "Введите ссылку на ваше резюме на google-длиске или hh.ru")
+        bot.register_next_step_handler(message, enter_resume, user_data, step=1, bot_message=bot_message)
+        bot.delete_message(message.from_user.id, message.id)
+
+    elif step == 1:
+        b, text = structure_checker.link_input(message.text, user_data, 'resume')
+        kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        kb.row('Да', 'Нет')
+        bot_message = bot.send_message(message.from_user.id,
+                                       'Верны ли данные:\n{}'.format(text),
+                                       reply_markup=kb)
+        bot.register_next_step_handler(message, enter_resume, user_data, bot_message=bot_message, yn=True, step=1)
+
+    elif step == 2:
+        end_polling(message, user_data)
+
+    bot.delete_message(message.from_user.id, message.id)
+
+
+def enter_tasks(message, user_data, step=0, yn=False, bot_message=None):
+    if yn:
+        if message.text == 'Да':
+            step += 1
+        else:
+            step -= 1
+
+    if bot_message is not None:
+        bot.delete_message(bot_message.chat.id, bot_message.id)
+
+    if step == 0:
+        bot_message = bot.send_message(message.from_user.id, "Введите ссылку на google-длиск с заданием")
+        bot.register_next_step_handler(message, enter_tasks, user_data, step=1, bot_message=bot_message)
+        bot.delete_message(message.from_user.id, message.id)
+
+    elif step == 1:
+        b, text = structure_checker.link_input(message.text, user_data, 'entrance_tasks')
+        kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        kb.row('Да', 'Нет')
+        bot_message = bot.send_message(message.from_user.id,
+                                       'Верны ли данные:\n{}'.format(text),
+                                       reply_markup=kb)
+        bot.register_next_step_handler(message, enter_tasks, user_data, bot_message=bot_message, yn=True, step=1)
+
+    elif step == 2:
+        end_polling(message, user_data)
 
     bot.delete_message(message.from_user.id, message.id)
 
