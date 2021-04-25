@@ -3,9 +3,8 @@ from telebot import types
 from config import token
 from Parsing_Data.FAQ import make_faq
 from Parsing_Data.get_vacancies import get_dict
-
-from coastal import json_generator
-from coastal import structure_checker
+from Data_Manager import json_generator
+from Data_Manager import structure_checker
 
 bot = telebot.TeleBot(token)
 
@@ -202,10 +201,11 @@ def callback_inline(call):
                               reply_markup=keyboard)
 
     elif call.data == '/form':
-        # bot.register_next_step_handler(call.message, polling)
-        kb = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-        kb.row('/form')
-        bot.send_message(call.message.chat.id, "Zayavka", reply_markup=kb)
+        bot.send_message(call.message.chat.id, "Чтобы отправить заявку на стажировку, "
+                                               "нужно заполнить анкету и выполнить тестирование.\n"
+                                               "Приступить к выполнению тестирования: /form\n")
+
+
 
 @bot.message_handler(commands=['form'])
 def polling(message, bot_message=None):
@@ -231,7 +231,7 @@ def end_polling(message, user_data, yn=False, bot_message=None):
         json_generator.update_user_data(message.from_user.id, user_data)
         kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
         kb.row('Да', 'Нет')
-        bot_message = bot.send_message(message.from_user.id, 'Хотетие продолжить заполнять анкету?', reply_markup=kb)
+        bot_message = bot.send_message(message.from_user.id, 'Хотите продолжить заполнять анкету?', reply_markup=kb)
         bot.register_next_step_handler(message, end_polling, user_data, yn=True, bot_message=bot_message)
 
     bot.delete_message(message.from_user.id, message.id)
@@ -285,7 +285,7 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, se
 
     elif step == 2:
 
-        bot_message = bot.send_message(message.from_user.id, "Введите вашу дату рождения в формате дд мм гггг:")
+        bot_message = bot.send_message(message.from_user.id, "Введите дату рождения в формате дд мм гггг:")
         bot.register_next_step_handler(message, enter_credentials, user_data, 3, bot_message=bot_message,
                                        sec_bot_message=sec_bot_message)
 
@@ -295,7 +295,7 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, se
 
     elif step == 4:
 
-        bot_message = bot.send_message(message.from_user.id, "Введите город жительства:")
+        bot_message = bot.send_message(message.from_user.id, "Введите город проживания:")
         bot.register_next_step_handler(message, enter_credentials, user_data, 5, bot_message=bot_message,
                                        sec_bot_message=sec_bot_message)
 
@@ -305,7 +305,7 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, se
 
     elif step == 6:
 
-        bot_message = bot.send_message(message.from_user.id, "Введите ваш адресс электронной почты:")
+        bot_message = bot.send_message(message.from_user.id, "Введите адрес электронной почты:")
         bot.register_next_step_handler(message, enter_credentials, user_data, 7, bot_message=bot_message,
                                        sec_bot_message=sec_bot_message)
 
@@ -315,7 +315,7 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, se
 
     elif step == 8:
 
-        bot_message = bot.send_message(message.from_user.id, "Введите ваш номер телефона:")
+        bot_message = bot.send_message(message.from_user.id, "Введите номер телефона:")
         bot.register_next_step_handler(message, enter_credentials, user_data, 9, bot_message=bot_message,
                                        sec_bot_message=sec_bot_message)
 
@@ -345,6 +345,7 @@ def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, se
             bot_message = bot.send_message(message.from_user.id, text)
             bot.delete_message(message.from_user.id, message.id)
             enter_credentials(message, user_data, step - 1, sec_bot_message=bot_message)
+    bot.delete_message(message.from_user.id, message.id)
 
 
 def enter_probation(message, user_data, step=0, yn=False, bot_message=None, sec_bot_message=None):
@@ -853,7 +854,7 @@ if __name__ == "__main__":
     faqs = make_faq()
     q_limit = 38
     welcome_photo = open(
-        '/Users/michaelgoloshchapov/PycharmProjects/Physics/URFU_best_21/Miscellaneous/Bot_Welcome.jpeg', 'rb')
+        'Bot_Welcome.jpeg', 'rb')
 
     bad_keys = set()
     for key in faqs.keys():

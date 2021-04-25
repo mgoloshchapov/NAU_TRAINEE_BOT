@@ -8,11 +8,12 @@ def name_input(name: str, data):
     if len(names) == 2:
         data['first_name'] = names[0]
         data['second_name'] = names[1]
+        data['patronymic'] = None
         return True, 'Имя: {}, Фамилия: {}'.format(names[0], names[1])
     elif len(names) > 2:
         data['first_name'] = names[0]
         data['second_name'] = names[1]
-        data['second_name'] = names[2]
+        data['patronymic'] = names[2]
         return True, 'Имя: {}, Фамилия: {}, Отчество: {}'.format(names[0], names[1], names[2])
     return False, 'Имя должно содерждать имя и фамилию'
 
@@ -62,14 +63,7 @@ def city_input_prob(name: str, data):
 
 
 def probation_time_input(string: str, data):
-    if string == '< 30 частов':
-        data['probation_working_time'] = 0
-    elif string == '> 30 часов':
-        data['probation_working_time'] = 1
-    elif string == '40 часов':
-        data['probation_working_time'] = 2
-    else:
-        return False, 'Неверная опция'
+    data['probation_working_time'] = string
     return True, 'Время: ' + string
 
 
@@ -83,14 +77,7 @@ def probation_year_input(year: str, data):
 
 
 def work_after_input(string: str, data):
-    if string == 'Нет':
-        data['probation_work_after'] = 0
-    elif string == 'Да, full-time':
-        data['probation_work_after'] = 1
-    elif string == 'Да, part-time':
-        data['probation_work_after'] = 2
-    else:
-        return False, 'Неверная опция'
+    data['probation_work_after'] = string
     return True, 'Время: ' + string
 
 

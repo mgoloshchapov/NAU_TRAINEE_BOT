@@ -1,11 +1,11 @@
 import json5
 
-import json_structure
+from Data_Manager import json_structure
 
 
 def init_user(user_id):
     if not test_for_user(user_id):
-        file = open('user_data/user_{}.json5'.format(user_id), 'w')
+        file = open('Data_Manager/user_data/user_{}.json5'.format(user_id), 'w')
         data = json_structure.dict_data()
         data['id'] = user_id
         json5.dump(data, file, indent=2)
@@ -14,7 +14,7 @@ def init_user(user_id):
 
 def test_for_user(user_id):
     try:
-        open('user_data/user_{}.json5'.format(user_id), 'r')
+        open('Data_Manager/user_data/user_{}.json5'.format(user_id), 'r')
     except FileNotFoundError:
         return False
     return True
@@ -22,7 +22,7 @@ def test_for_user(user_id):
 
 def get_user_data(user_id):
     if test_for_user(user_id):
-        file = open('user_data/user_{}.json5'.format(user_id), 'r')
+        file = open('Data_Manager/user_data/user_{}.json5'.format(user_id), 'r')
         data = json5.load(file)
         return data
     else:
@@ -30,5 +30,5 @@ def get_user_data(user_id):
 
 
 def update_user_data(user_id, data):
-    file = open('user_data/user_{}.json5'.format(user_id), 'w')
+    file = open('Data_Manager/user_data/user_{}.json5'.format(user_id), 'w')
     json5.dump(data, file, indent=2)
