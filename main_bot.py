@@ -5,6 +5,7 @@ from Parsing_Data.FAQ import make_faq
 from Parsing_Data.get_vacancies import get_dict
 from Data_Manager import json_generator
 from Data_Manager import structure_checker
+from Data_Manager import uploader
 
 bot = telebot.TeleBot(token)
 
@@ -214,7 +215,7 @@ def polling(message, bot_message=None):
     user_data = json_generator.get_user_data(message.from_user.id)
     kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, row_width=2)
     kb.add('Личные данные', 'Условия стажировки', 'Образование', 'Опыт работы', 'Опыт кандидата',
-           'Как ты узнал о Naumen?', 'Загрузка резюме', 'Отправка задания')
+           'Как ты узнал о Naumen?', 'Загрузка резюме', 'Отправка задания', 'Отправить заявку')
     bot_message = bot.send_message(message.from_user.id, 'Какую часть анкеты вы хотите заполниь?', reply_markup=kb)
     bot.register_next_step_handler(message, polling_distribution, user_data, bot_message=bot_message)
     bot.delete_message(message.from_user.id, message.id)
@@ -258,9 +259,51 @@ def polling_distribution(message, user_data, bot_message=None):
         enter_resume(message, user_data)
     elif t == 'Отправка задания':
         enter_tasks(message, user_data)
-        pass
+    elif t == 'Отправить заявку':
+        send_data(message, user_data)
 
     bot.delete_message(bot_message.chat.id, bot_message.id)
+
+
+def send_data(message, user_data, step=0, yn=False, bot_message=None):
+    if yn:
+        if message.text == 'Да':
+            step += 1
+        else:
+            step -= 1
+
+    if bot_message is not None:
+        bot.delete_message(bot_message.chat.id, bot_message.id)
+
+    if step == 0:
+        kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        kb.row('Да', 'Нет')
+        bot_message = bot.send_message(message.from_user.id, "Все ли данные заполнены?",  reply_markup=kb)
+        bot.register_next_step_handler(message, send_data, user_data, step=1, bot_message=bot_message)
+        bot.delete_message(message.from_user.id, message.id)
+
+    elif step == 1:
+        text = message.text
+        if text == 'Да':
+            kb = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+            kb.row('Да', 'Нет')
+            bot_message = bot.send_message(message.from_user.id,
+                                           'Вы даёте согласие на обработку данных?',
+                                           reply_markup=kb)
+            bot.register_next_step_handler(message, send_data, user_data, bot_message=bot_message, step=2)
+        else:
+            end_polling(message, user_data)
+            bot.delete_message(message.from_user.id, message.id)
+
+    elif step == 2:
+        text = message.text
+        if text == 'Да':
+            user_data['agreement'] = True
+            json_generator.update_user_data(user_data['id'], user_data)
+            uploader.upload(user_data['id'])
+            end_polling(message, user_data)
+
+    bot.delete_message(message.from_user.id, message.id)
 
 
 def enter_credentials(message, user_data, step=0, yn=False, bot_message=None, sec_bot_message=None):

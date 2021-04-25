@@ -1,4 +1,4 @@
-from spreadsheet import Manager
+from Data_Manager.spreadsheet import Manager
 
 m = Manager()
 Putin = 85
