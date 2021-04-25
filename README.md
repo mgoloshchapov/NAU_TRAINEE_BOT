@@ -13,4 +13,7 @@
 
 Сортирует отправленные анкеты по направлениям и составляет чистовую таблицу для HR
 
+![image](https://user-images.githubusercontent.com/43697696/115986557-62cbfa80-a5b9-11eb-9ec1-6835be1b857b.png)
+*Usermap
+
 https://docs.google.com/presentation/d/1Y040ConxjRUD9BzKbK8PUoAXVz3eyPpww4QNKhlmGAk/edit#slide=id.gd47fcddc99_3_0
