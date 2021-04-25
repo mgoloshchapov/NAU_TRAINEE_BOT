@@ -10,6 +10,4 @@
 - Предлагает обратиться на почту nautrainee@naumen.ru в случае вопросов
 - Сортирует отправленные анкеты по направлениям и составляет чистовую таблицу для HR
 
-![image](https://user-images.githubusercontent.com/43697696/115986557-62cbfa80-a5b9-11eb-9ec1-6835be1b857b.png)
-
-
+![image](https://user-images.githubusercontent.com/43697696/115986926-6496bd80-a5bb-11eb-98b3-02c9cc13f2d6.png)
